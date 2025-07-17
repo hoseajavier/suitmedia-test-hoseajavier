@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../assets/suitmedia-bg.png";
 
 export default function Header() {
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   const menuItems = ["Work", "About", "Services", "Ideas", "Careers", "Contact"];
 
@@ -26,6 +27,17 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  const isMenuItemActive = (item) => {
+    const currentPath = location.pathname;
+    const itemPath = `/${item.toLowerCase()}`;
+    
+    if (currentPath === "/" && item === "Ideas") {
+      return true;
+    }
+    
+    return currentPath === itemPath;
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-transform duration-300 ${
@@ -45,11 +57,9 @@ export default function Header() {
               <NavLink
                 key={item}
                 to={`/${item.toLowerCase()}`}
-                className={({ isActive }) =>
-                  `hover:underline underline-offset-8 transition ${
-                    isActive ? "underline" : ""
-                  }`
-                }
+                className={`hover:underline underline-offset-8 transition ${
+                  isMenuItemActive(item) ? "underline" : ""
+                }`}
               >
                 {item}
               </NavLink>
@@ -75,11 +85,9 @@ export default function Header() {
               <NavLink
                 key={item}
                 to={`/${item.toLowerCase()}`}
-                className={({ isActive }) =>
-                  `block py-2 hover:underline ${
-                    isActive ? "underline font-semibold" : ""
-                  }`
-                }
+                className={`block py-2 hover:underline ${
+                  isMenuItemActive(item) ? "underline font-semibold" : ""
+                }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {item}

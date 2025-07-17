@@ -13,7 +13,6 @@ export default function Ideas() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Load data
   useEffect(() => {
     const loadIdeas = async () => {
       setLoading(true);
@@ -32,7 +31,6 @@ export default function Ideas() {
 
   const totalPages = Math.ceil(total / size);
 
-  // Update URL query params (keeps state on refresh)
   const updateParam = (key, value) => {
     const params = Object.fromEntries(searchParams);
     params[key] = String(value);
@@ -42,7 +40,6 @@ export default function Ideas() {
     setSearchParams(params);
   };
 
-  // Compact pagination range (show 1–5 always, current, last, elipsis)
   const getPaginationRange = (current, total) => {
     const showPages = 5;
     const range = [];
@@ -51,27 +48,27 @@ export default function Ideas() {
       return Array.from({ length: total }, (_, i) => i + 1);
     }
 
-    // always show first N
+
     for (let i = 1; i <= Math.min(showPages, total); i++) {
       range.push(i);
     }
 
-    // left ellipsis region
+
     if (current > showPages + 1 && total > showPages + 2) {
       range.push("...");
     }
 
-    // current (if beyond shown)
+
     if (current > showPages && current < total - 1) {
       range.push(current);
     }
 
-    // right ellipsis region
+
     if (current < total - 2 && total > showPages + 2) {
       range.push("...");
     }
 
-    // last
+
     if (!range.includes(total)) {
       range.push(total);
     }
