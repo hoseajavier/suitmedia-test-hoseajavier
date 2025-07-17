@@ -16,38 +16,6 @@ export default function Header() {
     { title: "Contact", href: "" },
   ];
 
-  const getCurrentPageFromURL = () => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("page") || "Ideas";
-  };
-
-  const updateURLWithPage = (page) => {
-    const url = new URL(window.location);
-    if (page === "Ideas") {
-      url.searchParams.delete("page");
-    } else {
-      url.searchParams.set("page", page.toLowerCase());
-    }
-    window.history.pushState({}, "", url);
-  };
-
-  useEffect(() => {
-    const currentPage = getCurrentPageFromURL();
-    const formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
-    setActiveMenu(formattedPage);
-  }, []);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      const currentPage = getCurrentPageFromURL();
-      const formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
-      setActiveMenu(formattedPage);
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -71,7 +39,6 @@ export default function Header() {
 
   const handleMenuClick = (item) => {
     setActiveMenu(item.title);
-    updateURLWithPage(item.title);
     setIsMobileMenuOpen(false);
   };
 
