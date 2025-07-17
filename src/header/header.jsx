@@ -16,31 +16,27 @@ export default function Header() {
     { title: "Contact", href: "" },
   ];
 
-  // Get current page from URL query parameter
   const getCurrentPageFromURL = () => {
     const params = new URLSearchParams(window.location.search);
-    return params.get("page") || "Ideas"; // Default to "Ideas" if no page param
+    return params.get("page") || "Ideas";
   };
 
-  // Update URL with page parameter
   const updateURLWithPage = (page) => {
     const url = new URL(window.location);
     if (page === "Ideas") {
-      url.searchParams.delete("page"); // Remove page param for Ideas (default)
+      url.searchParams.delete("page");
     } else {
       url.searchParams.set("page", page.toLowerCase());
     }
     window.history.pushState({}, "", url);
   };
 
-  // Initialize active menu based on URL on component mount
   useEffect(() => {
     const currentPage = getCurrentPageFromURL();
     const formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
     setActiveMenu(formattedPage);
   }, []);
 
-  // Listen for browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
       const currentPage = getCurrentPageFromURL();
@@ -69,12 +65,10 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // Function to check if menu item is active
   const isMenuItemActive = (item) => {
     return activeMenu === item.title;
   };
 
-  // Handle menu click
   const handleMenuClick = (item) => {
     setActiveMenu(item.title);
     updateURLWithPage(item.title);
