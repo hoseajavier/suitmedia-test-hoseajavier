@@ -1,14 +1,56 @@
 import { useEffect, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../assets/suitmedia-bg.png";
 
 export default function Header() {
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
+  const [activeMenu, setActiveMenu] = useState("Ideas");
 
-  const menuItems = ["Work", "About", "Services", "Ideas", "Careers", "Contact"];
+  const menuItems = [
+    { title: "Work", href: "" },
+    { title: "About", href: "" },
+    { title: "Services", href: "" },
+    { title: "Ideas", href: "" },
+    { title: "Careers", href: "" },
+    { title: "Contact", href: "" },
+  ];
+
+  // Get current page from URL query parameter
+  const getCurrentPageFromURL = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("page") || "Ideas"; // Default to "Ideas" if no page param
+  };
+
+  // Update URL with page parameter
+  const updateURLWithPage = (page) => {
+    const url = new URL(window.location);
+    if (page === "Ideas") {
+      url.searchParams.delete("page"); // Remove page param for Ideas (default)
+    } else {
+      url.searchParams.set("page", page.toLowerCase());
+    }
+    window.history.pushState({}, "", url);
+  };
+
+  // Initialize active menu based on URL on component mount
+  useEffect(() => {
+    const currentPage = getCurrentPageFromURL();
+    const formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+    setActiveMenu(formattedPage);
+  }, []);
+
+  // Listen for browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const currentPage = getCurrentPageFromURL();
+      const formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+      setActiveMenu(formattedPage);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,15 +69,16 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  // Function to check if menu item is active
   const isMenuItemActive = (item) => {
-    const currentPath = location.pathname;
-    const itemPath = `/${item.toLowerCase()}`;
-    
-    if (currentPath === "/" && item === "Ideas") {
-      return true;
-    }
-    
-    return currentPath === itemPath;
+    return activeMenu === item.title;
+  };
+
+  // Handle menu click
+  const handleMenuClick = (item) => {
+    setActiveMenu(item.title);
+    updateURLWithPage(item.title);
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -54,15 +97,19 @@ export default function Header() {
           {/* Desktop Menu */}
           <nav className="hidden md:flex space-x-6 text-white font-medium">
             {menuItems.map((item) => (
-              <NavLink
-                key={item}
-                to={`/${item.toLowerCase()}`}
-                className={`hover:underline underline-offset-8 transition ${
+              <a
+                key={item.title}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleMenuClick(item);
+                }}
+                className={`hover:underline underline-offset-8 transition cursor-pointer ${
                   isMenuItemActive(item) ? "underline" : ""
                 }`}
               >
-                {item}
-              </NavLink>
+                {item.title}
+              </a>
             ))}
           </nav>
 
@@ -82,16 +129,19 @@ export default function Header() {
         {isMobileMenuOpen && (
           <div className="md:hidden mt-2 px-4 py-3 space-y-2 text-white bg-orange-500/95 rounded-md backdrop-blur">
             {menuItems.map((item) => (
-              <NavLink
-                key={item}
-                to={`/${item.toLowerCase()}`}
-                className={`block py-2 hover:underline ${
+              <a
+                key={item.title}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleMenuClick(item);
+                }}
+                className={`block py-2 hover:underline cursor-pointer ${
                   isMenuItemActive(item) ? "underline font-semibold" : ""
                 }`}
-                onClick={() => setIsMobileMenuOpen(false)}
               >
-                {item}
-              </NavLink>
+                {item.title}
+              </a>
             ))}
           </div>
         )}
